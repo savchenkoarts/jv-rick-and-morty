@@ -2,7 +2,6 @@ package mate.academy.rickandmorty.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import mate.academy.rickandmorty.dto.internal.CharacterConversionDto;
@@ -29,7 +28,6 @@ public class CharacterController {
     @Operation(summary = "Search characters", description = "Search characters")
     public List<CharacterConversionDto> searchCharacters(
             @RequestParam
-            @NotBlank(message = "Search parameter cannot be blank!")
             String searchParameter) {
         return service.searchCharacters(searchParameter);
     }

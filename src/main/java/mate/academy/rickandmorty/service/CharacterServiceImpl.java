@@ -30,7 +30,7 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Override
     public List<CharacterConversionDto> searchCharacters(String searchParameter) {
-        if (searchParameter.isEmpty()) {
+        if (searchParameter.isBlank()) {
             throw new EntityNotFoundException(
                     "Search parameter cannot be blank or empty. "
                             + "Please provide a valid search query."
