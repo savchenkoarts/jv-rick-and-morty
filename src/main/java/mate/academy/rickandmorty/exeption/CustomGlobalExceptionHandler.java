@@ -28,17 +28,31 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     ) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST);
+        body.put("status", status);
         List<String> errors = ex.getBindingResult().getFieldErrors().stream()
                 .map(this::getErrorMessage)
                 .toList();
         body.put("errors", errors);
-        return new ResponseEntity<>(body, headers, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(body, headers, status);
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<String> handleNotFoundExceptions(EntityNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MalformedUrlException.class)
+    public ResponseEntity<String> handleMalformedUrlExceptions(MalformedUrlException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CharacterClientException.class)
+    public ResponseEntity<String> handleClientExceptions(CharacterClientException ex) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        if (ex.getMessage().contains("Failed to fetch data")) {
+            status = HttpStatus.BAD_GATEWAY;
+        }
+        return new ResponseEntity<>(ex.getMessage(), status);
     }
 
     private String getErrorMessage(ObjectError e) {

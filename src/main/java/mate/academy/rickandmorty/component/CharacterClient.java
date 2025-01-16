@@ -25,6 +25,13 @@ public class CharacterClient {
         try {
             HttpResponse<String> response = client
                     .send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                throw new CharacterClientException(String.format(
+                        "Failed to fetch data. HTTP status: %d, Response: %s",
+                        response.statusCode(),
+                        response.body()
+                ));
+            }
             return objectMapper.readValue(response.body(), CharacterResponseDataDto.class);
         } catch (IOException | InterruptedException e) {
             throw new CharacterClientException(

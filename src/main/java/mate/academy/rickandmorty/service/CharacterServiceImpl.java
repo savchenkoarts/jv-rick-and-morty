@@ -1,6 +1,7 @@
 package mate.academy.rickandmorty.service;
 
 import java.util.List;
+import java.util.Random;
 import lombok.RequiredArgsConstructor;
 import mate.academy.rickandmorty.dto.internal.CharacterConversionDto;
 import mate.academy.rickandmorty.exeption.EntityNotFoundException;
@@ -17,19 +18,23 @@ public class CharacterServiceImpl implements CharacterService {
 
     @Override
     public CharacterConversionDto getRandomCharacter() {
-        long count = repository.count();
-        if (count == 0) {
-            throw new EntityNotFoundException("No characters available");
+        List<Long> ids = repository.findAllIds();
+        if (ids.isEmpty()) {
+            throw new EntityNotFoundException("No characters found");
         }
-        CharacterModel model = repository.findById((long) (Math.random() * count))
+        Long randomId = ids.get(new Random().nextInt(ids.size()));
+        CharacterModel model = repository.findById(randomId)
                 .orElseThrow(() -> new EntityNotFoundException("Character not found"));
         return characterMapper.toCharacterConversionDto(model);
     }
 
     @Override
     public List<CharacterConversionDto> searchCharacters(String searchParameter) {
-        if (searchParameter.isBlank()) {
-            throw new EntityNotFoundException("Search parameter is empty");
+        if (searchParameter.isEmpty()) {
+            throw new EntityNotFoundException(
+                    "Search parameter cannot be blank or empty. "
+                            + "Please provide a valid search query."
+            );
         }
         List<CharacterModel> characters =
                 repository.findByNameContainingIgnoreCase(searchParameter);
